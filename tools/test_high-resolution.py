@@ -6,7 +6,7 @@ def capture_frames():
     global frame
 
     # Open the camera capture
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
 
     # Set the desired resolution
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)

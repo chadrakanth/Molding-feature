@@ -1,32 +1,58 @@
 import cv2
-import numpy as np
-import os
 
+cv2.namedWindow("Result",cv2.WINDOW_GUI_NORMAL)
 
-# Load the images
-img1 = cv2.imread('/home/ssg/Desktop/project/Molding-feature/templates/0.jpg', cv2.IMREAD_GRAYSCALE)
-img2 = cv2.imread('image2.jpg', cv2.IMREAD_GRAYSCALE)
+def find_template(image_gray, template_gray, threshold=0.7):
+    # Convert the images to grayscale (necessary for template matching)
+  
 
-# Create SURF object
-surf = cv2.xfeatures2d.SURF_create()
+    # Perform template matching
+    result = cv2.matchTemplate(image_gray, template_gray, cv2.TM_CCOEFF_NORMED)
 
-# Detect keypoints and compute descriptors for both images
-kp1, des1 = surf.detectAndCompute(img1, None)
-kp2, des2 = surf.detectAndCompute(img2, None)
+    # Get the location of the best match (top-left corner of the rectangle)
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
 
-# Create a brute-force matcher object
-bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
+    if max_val >= threshold:
+        # Get the width and height of the template image
+        template_width, template_height = template_gray.shape[::-1]
 
-# Match the descriptors
-matches = bf.match(des1, des2)
+        # Calculate the bottom-right corner of the rectangle
+        bottom_right = (max_loc[0] + template_width, max_loc[1] + template_height)
 
-# Sort the matches by distance
-matches = sorted(matches, key=lambda x: x.distance)
+        return max_loc, bottom_right
+    else:
+        return None
 
-# Draw the top 10 matches
-result = cv2.drawMatches(img1, kp1, img2, kp2, matches[:10], None, flags=2)
+# Load the main image and the template image
+template_image = '/home/ssg/project/0.png'
 
-# Display the result
-cv2.imshow('SURF Matches', result)
-cv2.waitKey(0)
+template_image = cv2.imread(template_image,0)
+
+# Find the template in the main image
+cap = cv2.VideoCapture(0)
+while (1):
+    _,main_image = cap.read()  
+    main_image = cv2.cvtColor(main_image,cv2.COLOR_BGR2GRAY)
+    main_image= main_image[190:250,270:380]
+    result = find_template(main_image, template_image)
+
+    # Draw a rectangle around the matched region on the main image
+
+        
+
+    if result is not None:
+        top_left, bottom_right = result
+
+        # Draw a rectangle around the matched region on the main image
+        cv2.rectangle(main_image, result[0], result[1], (0, 255, 0), 2)
+    else:
+        print("Template not found.")
+
+    # Display the result
+    cv2.imshow('Result', main_image)
+    if cv2.waitKey(1) & 0xff == ord("q"):
+        break
+
+cap.release()
 cv2.destroyAllWindows()
+

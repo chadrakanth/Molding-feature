@@ -3,7 +3,7 @@ import time
 
 import timeit
 # Open the camera capture
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 cv2.namedWindow("Frame",cv2.WINDOW_GUI_NORMAL)
 
