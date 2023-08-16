@@ -164,7 +164,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.graphicsView = QGraphicsView(self.frame_5)
+        self.graphicsView = QLabel(self.frame_5)
+        self.graphicsView.setScaledContents(True)
         self.graphicsView.setObjectName(u"graphicsView")
 
         self.verticalLayout_3.addWidget(self.graphicsView)

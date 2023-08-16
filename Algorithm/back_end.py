@@ -1,4 +1,6 @@
 import cv2
+import numpy as np
+
 
 class template_handler:
 
@@ -7,9 +9,15 @@ class template_handler:
         self.cam = cam
         self.drawing = False
         self.templates = []
-        cv2.namedWindow("Display")
+        self.storage = []
+        cv2.namedWindow("Display",cv2.WINDOW_GUI_EXPANDED)
+        cv2.add
         cv2.setMouseCallback("Display",self.box_draw)
-        cv2.createButton('Printer', self.on_button_click, None, cv2.QT_PUSH_BUTTON)
+        button = cv2.createButton('Printer', self.on_button_click, True, cv2.QT_PUSH_BUTTON)
+        pic = np.zeros((100,100))
+        cv2.rectangle(pic,[0,0],[640,20],(255,255,0),cv2.LINE_AA)
+        print(button)
+
 
     def on_button_click(self,state,state2):
         print(int((len(self.templates))/2))
@@ -32,10 +40,16 @@ class template_handler:
             self.drawing = False
             #print("drawing Disabled")
 
-    def pre_processing(self,image):
-        
-        return  cv2.equalizeHist(cv2.cvtColor(image,
+    def pre_processing(self,image,store = 10):
+        image = cv2.equalizeHist(cv2.cvtColor(image,
                                              cv2.COLOR_BGR2GRAY))
+        
+        self.storage.append(image)
+        if len(self.storage) >= store:
+            self.storage.pop(0) 
+
+        return np.uint8((np.sum(self.storage,axis=0))/len(self.storage))
+    
     
     def destriction(self):
         self.cam.release()
@@ -69,7 +83,7 @@ class template_handler:
 
 if __name__  == "__main__":
 
-    obj = template_handler(cv2.VideoCapture(0))
+    obj = template_handler(cv2.VideoCapture(2))
     obj.main()
 
 
